@@ -1,0 +1,13 @@
+# Essencial: zoom, HUD de informações e amigos com chat e convites.
+# Um "trait mod" do Horizon (docs/native-mods.md, "Trait mods"): o launcher compila a pasta api/
+# junto com o jogo. Instale pelo launcher: Mods > Adicionar do GitHub.
+[mod]
+id = "essencial"
+version = "0.1.0"
+
+# O build do Horizon para o qual o mod foi feito (o Nightly de 13/11/2026).
+[compatibility]
+horizon_revision = "9f42064c11efe7ef3e5ed2baad7ddc2a3b36eea0"
+
+[api]
+path = "api"

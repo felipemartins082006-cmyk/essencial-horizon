@@ -18,6 +18,21 @@ mod estado;
 #[path = "../../mod/src/amigos/rede.rs"]
 mod rede;
 
+// A lógica do mod para o launcher 0.2 (`essencial/`), que não depende do jogo: testada aqui,
+// com o mesmo protocolo e a mesma rede (as cópias de `essencial/api/src` são iguais às de `mod/`).
+#[cfg(test)]
+#[allow(dead_code)]
+#[path = "../../essencial/api/src/amigos.rs"]
+mod amigos;
+#[cfg(test)]
+#[allow(dead_code)]
+#[path = "../../essencial/api/src/opcoes.rs"]
+mod opcoes;
+#[cfg(test)]
+#[allow(dead_code)]
+#[path = "../../essencial/api/src/tela.rs"]
+mod tela;
+
 use estado::{Entrada, Envio, Estado, Salvo};
 use protocolo::{DoCliente, DoServidor};
 use std::collections::HashMap;

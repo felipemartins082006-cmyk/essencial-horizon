@@ -1,0 +1,11 @@
+[package]
+name = "mod-essencial"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+publish = false
+
+[dependencies]
+# O launcher aponta isto para o código do Horizon com que compila o jogo. Qualquer outra
+# dependência precisa estar no Cargo.lock do Horizon.
+horizon-client = { git = "https://github.com/horizon-rust/horizon", rev = "9f42064c11efe7ef3e5ed2baad7ddc2a3b36eea0" }

@@ -16,6 +16,11 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test
+      - name: As cópias do protocolo e da rede em essencial/ são iguais às de mod/
+        working-directory: .
+        run: |
+          cmp mod/src/protocolo.rs essencial/api/src/protocolo.rs
+          cmp mod/src/amigos/rede.rs essencial/api/src/rede.rs
 
   mod:
     runs-on: ubuntu-latest
@@ -36,3 +41,35 @@ jobs:
         run: cargo clippy --all-targets -- -D warnings
       - working-directory: mod
         run: cargo test
+
+  # O mod para o launcher 0.2 (essencial/): compila contra o Horizon fixado em horizon-mixin.toml,
+  # como o launcher faz, mas sem som e controles (que pedem bibliotecas do sistema).
+  essencial:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable && rustup component add clippy rustfmt
+      - name: Baixar o Horizon na versão fixada em horizon-mixin.toml
+        run: |
+          versao=$(sed -n 's/^horizon_revision = "\([0-9a-f]\{40\}\)"$/\1/p' essencial/horizon-mixin.toml)
+          git init -q horizon
+          git -C horizon fetch -q --depth 1 https://github.com/horizon-rust/horizon "$versao"
+          git -C horizon checkout -q FETCH_HEAD
+      - name: Montar o pacote com o Horizon local
+        run: |
+          mkdir -p verificar
+          cp -r essencial/api/src verificar/
+          cp horizon/Cargo.lock verificar/
+          cat > verificar/Cargo.toml <<TOML
+          [package]
+          name = "mod-essencial"
+          version = "0.1.0"
+          edition = "2024"
+          publish = false
+          [dependencies]
+          horizon-client = { path = "$PWD/horizon/crates/horizon-client", default-features = false, features = ["horizon-extras"] }
+          TOML
+      - working-directory: essencial/api
+        run: cargo fmt --check
+      - working-directory: verificar
+        run: cargo clippy --all-targets -- -D warnings
