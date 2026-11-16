@@ -1,37 +1,53 @@
 # Essencial para Horizon
 
 Um mod para o [Horizon](https://github.com/horizon-rust/horizon) (o Minecraft: Java Edition reescrito em Rust)
-com as funções que mais se usa no Essential: **zoom**, **HUD de informações** e **amigos com chat e convites
-para o seu mundo**.
+com as funções que mais se usa no Essential: **zoom**, **HUD de informações** e **amigos com mensagens e
+convites para o seu mundo**.
 
 > Este projeto foi escrito do zero. Ele **não usa nem copia o código do Essential** (a licença do Essential
 > não permite modificar nem fazer obras derivadas) e não se conecta aos servidores da empresa do Essential.
 > "Essential" é marca da ModCore Inc.; este projeto não tem ligação com ela.
 
+## Duas versões do mod
+
+O Horizon mudou o formato dos mods nativos entre o launcher que está publicado e o código mais novo dele. Este
+repositório tem as duas; o launcher instala sozinho a que ele entende.
+
+| Pasta | Para qual Horizon | Formato |
+| --- | --- | --- |
+| `essencial/` | **launcher 0.2.x (o publicado hoje)**, build Nightly de 13/11/2026 | `horizon-mixin.toml` + pasta `api/` |
+| `mod/` | o código mais novo do Horizon (launcher que ainda não saiu) | `horizon-mod.toml` |
+
+As duas fazem as mesmas coisas; muda só onde ficam as opções e os comandos (veja abaixo).
+
 ## O que tem
 
 | Função | Como usar |
 | --- | --- |
-| **Zoom** | Segure **C**. A roda do mouse aproxima e afasta (de 1,5x a 50x). |
-| **HUD** | FPS, coordenadas, direção e ping num canto da tela. |
+| **Zoom** | Aperte **C**. A roda do mouse aproxima e afasta (de 1,5x a 50x). |
+| **HUD** | FPS, coordenadas e direção num canto da tela (e o nível do zoom enquanto ele está ativo). |
 | **Amigos** | A tecla **O** abre a lista: adicionar, aceitar, mandar mensagem, convidar e remover. |
-| **Chat** | Comandos que começam com `.` (veja abaixo); eles não vão para o servidor do jogo. |
+| **Avisos** | Mensagens, convites e pedidos de amizade aparecem como notificação no canto da tela. |
 | **Convites** | Manda o código do "Jogue com amigos" do Horizon para um amigo com um clique. |
 
-As teclas mudam em **Opções > Controles** (categoria Essencial). O resto fica em **Opções > Mods > Essencial >
-Config**: nível inicial do zoom, zoom por toque (liga/desliga) ou segurando, quais linhas o HUD mostra e em
-qual canto, mostrar ou não aos amigos em que servidor você está, e os avisos na tela.
+**Opções** ficam em **Opções > Mods > Essencial**: zoom inicial, apertar ou segurar a tecla do zoom, roda do
+mouse no zoom, HUD e o canto dele, amigos ligados, mostrar aos amigos em que servidor você está, e os avisos.
+As teclas (C e O) também mudam nessa página.
 
-## Instalar o mod
+Se você já tem o mod **Zoom** do Horizon instalado, ele usa a tecla Z e o Essencial a C; os dois funcionam, mas
+basta um.
 
-Você precisa do launcher do Horizon com uma instância já criada.
+## Instalar
+
+Você precisa do launcher do Horizon com uma instância **já preparada**: se ela aparece como "Precisa ser
+preparada", clique em **Jogar** nela uma vez antes (o launcher monta o jogo a partir do seu Minecraft 26.3).
 
 1. No launcher, abra a página **Mods**.
-2. Clique em **Adicionar do GitHub** e cole:
-   `https://github.com/felipemartins082006-cmyk/essencial-horizon`
-3. Aceite o aviso de código nativo. O launcher mostra o link do código antes; mods nativos rodam com acesso
-   ao seu computador, então só instale o que você confia.
-4. O launcher compila o mod (na primeira vez demora alguns minutos). Depois é só abrir o jogo.
+2. Em **Adicionar um mod nativo do GitHub**, cole
+   `https://github.com/felipemartins082006-cmyk/essencial-horizon` e clique em **Adicionar do GitHub**.
+3. Aceite o aviso de código nativo. Mods nativos rodam com acesso ao seu computador, então só instale o que você
+   confia.
+4. Em **Instalado**, clique em **Compilar** (a primeira vez demora alguns minutos) e depois abra o jogo.
 
 Pelo terminal é o mesmo:
 
@@ -73,89 +89,84 @@ cargo run --release -- --porta 25590 --dados /caminho/para/essencial-dados.json
 
 ### Ligar os amigos no mod
 
-Depois de abrir o jogo com o mod uma vez, edite o arquivo `config/essencial.toml` da instância:
+Depois de abrir o jogo com o mod uma vez, edite o arquivo `config/essencial.toml` da instância (a pasta da
+instância abre pelo launcher):
 
 ```toml
 servidor = "192.168.0.10:25590"
 ```
 
-O mod percebe a mudança sozinho, sem reiniciar. Entre num mundo ou servidor (o mod precisa do seu nome de
-jogador) e aperte **O**.
+O mod percebe a mudança sozinho, sem reiniciar. Ele usa o nome da conta conectada no launcher; se você joga sem
+conta, coloque também `nome = "SeuNome"` no mesmo arquivo. Depois aperte **O** num mundo.
 
 ### Como a conta funciona
 
 Não tem senha nem cadastro. Na primeira vez que você conecta, o servidor guarda o seu nome de jogador junto com
-um segredo aleatório que o mod cria neste computador (em `horizon-mod-data/essencial/segredo.txt`). Depois, só
-esse computador entra com esse nome. Se você trocar de computador, copie o `segredo.txt` para o novo.
+um segredo aleatório que o mod cria neste computador (`segredo.txt`, na pasta de dados do mod). Depois, só esse
+computador entra com esse nome. Se você trocar de computador, copie o `segredo.txt` para o novo.
 
 ## Comandos do chat
 
+Na versão `essencial/` (launcher 0.2.x):
+
 | Comando | O que faz |
 | --- | --- |
-| `.amigos` | abre a tela de amigos |
-| `.add <nome>` | pede amizade |
-| `.aceitar <nome>` / `.recusar <nome>` | responde a um pedido |
-| `.remover <nome>` | desfaz a amizade (ou cancela um pedido que você fez) |
-| `.msg <nome> <texto>` | mensagem privada |
-| `.r <texto>` | responde a última mensagem |
-| `.convidar <nome>` | manda o código do seu mundo |
-| `.entrar` | copia o código do último convite que você recebeu |
-| `.lista` | mostra quem está online |
-| `.ajuda` | lista os comandos |
+| `/amigos` | abre a tela de amigos |
+| `/e add <nome>` | pede amizade |
+| `/e aceitar <nome>` / `/e recusar <nome>` | responde a um pedido |
+| `/e remover <nome>` | desfaz a amizade (ou cancela um pedido que você fez) |
+| `/e msg <nome> <texto>` | mensagem privada |
+| `/e r <texto>` | responde a última mensagem |
+| `/e convidar <nome>` | manda o código do seu mundo |
+| `/e entrar` | copia o código do último convite que você recebeu |
+| `/e lista` | mostra quem está online |
+| `/e ajuda` | lista os comandos na tela de amigos |
+
+Esses comandos ficam no seu jogo; nunca vão para o servidor em que você está jogando. Na versão `mod/` os
+mesmos comandos começam com ponto (`.add`, `.msg`, `.convidar`...).
 
 ### Convidar para o seu mundo
 
 1. No seu mundo, aperte **Esc** e clique no botão **Amigos** (Jogue com amigos).
 2. Clique em **Comece a compartilhar** e depois em **Copiar código**.
-3. Na tela do Essencial (**O**), clique em **Convidar** ao lado do amigo, ou digite `.convidar <nome>`.
+3. Na tela do Essencial (**O**), clique em **Convidar** ao lado do amigo, ou digite `/e convidar <nome>`.
 
-O amigo recebe uma mensagem com **[Copiar código]**. Ele cola o código em **Multijogador > Conexão direta**, ou no
-botão **Amigos** da tela de título (**Junte-se a um amigo**). A API de mods do Horizon não deixa um mod entrar num
-mundo sozinho; por isso é preciso colar o código.
+O amigo recebe uma notificação. Ele aperta **O** e clica em **Copiar convite** (ou digita `/e entrar`) e cola o
+código em **Multijogador > Conexão direta**, ou no botão **Amigos** da tela de título (**Junte-se a um amigo**).
+A API de mods do Horizon não deixa um mod entrar num mundo sozinho; por isso é preciso colar o código.
 
 ## Limitações
 
 - As mensagens entre o mod e o servidor de amigos **não são criptografadas**. Não mande nada sensível por elas,
   e prefira rede local ou VPN. (O mundo compartilhado pelo Horizon continua criptografado.)
 - Mensagens só chegam se o amigo estiver online; não ficam guardadas.
+- Na versão `essencial/`, as mensagens aparecem como notificação e na tela de amigos, não no chat do jogo (a API
+  de mods dessa versão não deixa um mod escrever no chat), e o HUD não mostra o ping.
 - Não tem cosméticos, emotes nem gerenciador de capturas de tela.
-- O mod foi feito para a versão do Horizon fixada em `mod/horizon-mod.toml` (`[native] horizon`). O launcher
-  compila contra a versão que você tem instalada, se ela for compatível. Se ele recusar, rode
-  `cargo horizon-mod update` na pasta `mod/` para fixar a versão nova.
+- `essencial/` é fixado no build do Horizon de 13/11/2026. Se o seu launcher estiver em outro build, ele pergunta
+  se quer **Compilar mesmo assim**; normalmente funciona.
 
 ## Para quem quer mexer no código
 
 ```text
-mod/                    o mod (projeto nativo do Horizon)
-  horizon-mod.toml      manifesto: id, versão e a versão do Horizon fixada
-  src/lib.rs            os ganchos (hooks) do jogo
-  src/zoom.rs           zoom
-  src/hud.rs            HUD
-  src/amigos/           lista de amigos, comandos do chat, tela (tela.rs) e rede (rede.rs)
-  src/protocolo.rs      o protocolo de texto entre mod e servidor (o servidor usa o mesmo arquivo)
-  assets/essencial/lang traduções (pt_br e en_us)
+essencial/              o mod para o launcher 0.2.x
+  horizon-mixin.toml    manifesto: id, versão e o build do Horizon fixado
+  api/src/lib.rs        os ganchos do jogo (zoom, HUD, teclas, comandos, tela)
+  api/src/amigos.rs     lista de amigos, avisos e comandos /e
+  api/src/tela.rs       a tela de amigos
+  api/src/opcoes.rs     as opções e o config/essencial.toml
+mod/                    o mod para o Horizon mais novo (horizon-mod.toml)
 servidor/               o servidor de amigos (Rust puro, sem o Horizon)
 ```
 
-Testes do servidor, que incluem um teste de ponta a ponta usando o código de rede do próprio mod:
+`protocolo.rs` (o protocolo entre mod e servidor) e `rede.rs` (a conexão) são o mesmo arquivo nas duas versões do
+mod; o servidor usa o de `mod/`, e o CI confere que as cópias de `essencial/` são iguais.
+
+Testes do servidor, que também rodam a lógica do mod (lista de amigos, comandos, tela, opções) e um teste de
+ponta a ponta com o código de rede do próprio mod:
 
 ```bash
 cd servidor && cargo test
-```
-
-Os testes do mod precisam do código do Horizon. Clone o Horizon e aponte `mod/.horizon/sdk/api` para ele (o
-`cargo horizon-mod` faz isso sozinho quando há SDK publicado para a versão fixada):
-
-```bash
-git clone https://github.com/horizon-rust/horizon ../horizon
-```
-
-```bash
-mkdir -p mod/.horizon/sdk && ln -s "$(pwd)/../horizon" mod/.horizon/sdk/api
-```
-
-```bash
-cd mod && cargo test
 ```
 
 ## Licença
