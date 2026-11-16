@@ -1,0 +1,17 @@
+id = "essencial"
+name = "Essencial"
+version = "0.1.0"
+description = "Zoom, HUD de informações e lista de amigos com chat e convites para o seu mundo. Feito do zero para o Horizon, inspirado no Essential (sem código dele)."
+authors = ["felipemartins082006-cmyk"]
+license = "MIT"
+homepage = "https://github.com/felipemartins082006-cmyk/essencial-horizon"
+issues = "https://github.com/felipemartins082006-cmyk/essencial-horizon/issues"
+# A native mod: Rust in src/, compiled by the launcher against the game build [native] pins, beside data/ and assets/.
+api = "0.2"
+side = "client"
+capabilities = ["registries"]
+
+[native]
+game = "26.3"
+horizon = "85b5bcca7c79bb470b90bdb5914b413aa66fe7ae"
+mixins = "e59da9094f0c2fdda6c627fe9eff22dec6a906f0"

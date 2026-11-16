@@ -1,0 +1,4 @@
+/target
+/.horizon
+# O launcher resolve as dependências contra o SDK do Horizon; não fixar aqui.
+/Cargo.lock
