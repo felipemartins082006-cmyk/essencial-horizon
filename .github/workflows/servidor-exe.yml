@@ -1,0 +1,61 @@
+# Compila o servidor de amigos para Windows e Linux e publica no GitHub, na página
+# Releases, em "Servidor de amigos" (link fixo: releases/download/servidor/<arquivo>).
+# Fica marcado como pré-lançamento para o launcher do Horizon continuar instalando o mod
+# do branch main (ele usa a última release que não é pré-lançamento).
+name: Servidor (executáveis)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "servidor/**"
+      - "mod/src/protocolo.rs"
+      - "mod/src/amigos/rede.rs"
+      - ".github/workflows/servidor-exe.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  compilar:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            origem: servidor/target/release/essencial-servidor.exe
+            arquivo: essencial-servidor-windows.exe
+          - os: ubuntu-latest
+            origem: servidor/target/release/essencial-servidor
+            arquivo: essencial-servidor-linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable
+      - working-directory: servidor
+        run: cargo build --release --locked
+      - shell: bash
+        run: cp "${{ matrix.origem }}" "${{ matrix.arquivo }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arquivo }}
+          path: ${{ matrix.arquivo }}
+
+  publicar:
+    needs: compilar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: arquivos
+          merge-multiple: true
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete servidor --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes || true
+          gh release create servidor arquivos/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Servidor de amigos" \
+            --notes "Servidor de amigos do Essencial. Windows: baixe essencial-servidor-windows.exe e dê dois cliques. Veja o README para os passos."

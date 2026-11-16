@@ -65,9 +65,29 @@ computador para o do amigo pelo "Jogue com amigos" do próprio Horizon. O servid
 
 Uma pessoa do grupo roda o servidor; todos colocam o endereço dele no mod.
 
-### Rodar o servidor
+### Rodar o servidor (Windows, sem instalar nada)
 
-Precisa do [Rust](https://rustup.rs) instalado. Na pasta deste repositório:
+1. Baixe o servidor:
+   [essencial-servidor-windows.exe](https://github.com/felipemartins082006-cmyk/essencial-horizon/releases/download/servidor/essencial-servidor-windows.exe)
+   (também na página **Releases** do repositório, em "Servidor de amigos").
+2. Crie uma pasta, por exemplo `Documentos\Essencial Servidor`, e coloque o arquivo nela. É ali que ele guarda as
+   contas (`essencial-dados.json`).
+3. Dê dois cliques no arquivo.
+   - Se o Windows mostrar "O Windows protegeu o computador", clique em **Mais informações** e depois em
+     **Executar assim mesmo** (o arquivo não é assinado, por isso o aviso).
+   - Se o Firewall perguntar, marque **Redes privadas** e clique em **Permitir acesso**.
+4. Abre uma janela preta dizendo **Servidor do Essencial ouvindo em 0.0.0.0:25590** e mostrando o que cada jogador
+   coloca na configuração. **Deixe essa janela aberta** enquanto jogam; para desligar, feche a janela.
+
+Que endereço usar:
+
+- **Você mesmo, no computador do servidor:** `127.0.0.1:25590`.
+- **Amigos na mesma casa (mesmo Wi-Fi):** o IP que a janela mostra em "na mesma rede", por exemplo `192.168.0.10:25590`.
+- **Amigos em outras casas:** o jeito mais fácil é o [Tailscale](https://tailscale.com) (grátis): todos instalam,
+  entram na mesma rede do Tailscale, e usam o IP `100.x.x.x` que o Tailscale mostra para o computador do
+  servidor, com `:25590` no fim. A outra opção é abrir a porta 25590 (TCP) no roteador e usar o seu IP público.
+
+No Linux ou macOS, rode pelo código (precisa do [Rust](https://rustup.rs)):
 
 ```bash
 cd servidor
@@ -77,15 +97,8 @@ cd servidor
 cargo run --release
 ```
 
-Ele ouve na porta **25590** e guarda as contas em `essencial-dados.json`, na pasta onde foi aberto. Para mudar:
-
-```bash
-cargo run --release -- --porta 25590 --dados /caminho/para/essencial-dados.json
-```
-
-- **Mesma casa (rede local):** use o IP do computador do servidor, por exemplo `192.168.0.10:25590`.
-- **Pela internet:** rode numa VPS, ou abra a porta 25590 (TCP) no roteador para o computador do servidor.
-  Uma VPN como Tailscale ou ZeroTier também funciona e evita abrir porta.
+Para mudar a porta ou onde ficam os dados: `cargo run --release -- --porta 25590 --dados /caminho/essencial-dados.json`
+(no Windows, os mesmos `--porta` e `--dados` depois do `.exe`, por um atalho ou pelo Prompt de Comando).
 
 ### Ligar os amigos no mod
 

@@ -277,20 +277,32 @@ fn argumentos() -> Result<(String, u16, PathBuf), String> {
     Ok((endereco, porta, dados))
 }
 
+/// Mostra o erro e espera Enter antes de fechar: aberto com dois cliques no Windows, a janela
+/// sumiria antes de dar para ler.
+fn sair_com_erro(texto: &str, codigo: i32) -> ! {
+    eprintln!("{texto}");
+    eprintln!("Aperte Enter para fechar.");
+    let _ = std::io::stdin().read_line(&mut String::new());
+    std::process::exit(codigo);
+}
+
+/// O endereço deste computador na rede local, se houver uma. Não manda nada: só pergunta ao
+/// sistema qual placa de rede ele usaria para sair.
+fn ip_local() -> Option<std::net::IpAddr> {
+    let socket = std::net::UdpSocket::bind("0.0.0.0:0").ok()?;
+    socket.connect("192.0.2.1:9").ok()?;
+    let ip = socket.local_addr().ok()?.ip();
+    (!ip.is_loopback() && !ip.is_unspecified()).then_some(ip)
+}
+
 fn main() {
     let (endereco, porta, dados) = match argumentos() {
         Ok(a) => a,
-        Err(e) => {
-            eprintln!("{e}");
-            std::process::exit(2);
-        }
+        Err(e) => sair_com_erro(&e, 2),
     };
     let salvo = match carregar(&dados) {
         Ok(s) => s,
-        Err(e) => {
-            eprintln!("não consegui ler {}: {e}", dados.display());
-            std::process::exit(1);
-        }
+        Err(e) => sair_com_erro(&format!("não consegui ler {}: {e}", dados.display()), 1),
     };
     println!(
         "{} contas carregadas de {}",
@@ -299,12 +311,24 @@ fn main() {
     );
     let ouvinte = match TcpListener::bind((endereco.as_str(), porta)) {
         Ok(o) => o,
-        Err(e) => {
-            eprintln!("não consegui abrir {endereco}:{porta}: {e}");
-            std::process::exit(1);
-        }
+        Err(e) => sair_com_erro(
+            &format!(
+                "não consegui abrir {endereco}:{porta}: {e}\n(O servidor já está aberto em outra janela?)"
+            ),
+            1,
+        ),
     };
     println!("Servidor do Essencial ouvindo em {endereco}:{porta}");
+    println!();
+    println!("No config/essencial.toml de cada jogador, coloque:");
+    println!("  neste computador:        servidor = \"127.0.0.1:{porta}\"");
+    if let Some(ip) = ip_local() {
+        println!("  na mesma rede (Wi-Fi):   servidor = \"{ip}:{porta}\"");
+    }
+    println!("  pela internet: o IP do Tailscale/ZeroTier deste computador, ou o IP público");
+    println!("  com a porta {porta} (TCP) aberta no roteador.");
+    println!();
+    println!("Deixe esta janela aberta enquanto jogam. Para desligar, feche a janela.");
     servir(ouvinte, salvo, dados);
 }
 
