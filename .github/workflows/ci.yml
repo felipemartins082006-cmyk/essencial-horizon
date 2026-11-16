@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  servidor:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: servidor
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable && rustup component add clippy rustfmt
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+
+  mod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable && rustup component add clippy rustfmt
+      - name: Baixar o Horizon na versão fixada em horizon-mod.toml
+        run: |
+          versao=$(sed -n 's/^horizon = "\([0-9a-f]\{40\}\)"$/\1/p' mod/horizon-mod.toml)
+          git init -q horizon
+          git -C horizon fetch -q --depth 1 https://github.com/horizon-rust/horizon "$versao"
+          git -C horizon checkout -q FETCH_HEAD
+          mkdir -p mod/.horizon/sdk
+          ln -s "$PWD/horizon" mod/.horizon/sdk/api
+      - working-directory: mod
+        run: cargo fmt --check
+      - working-directory: mod
+        run: cargo clippy --all-targets -- -D warnings
+      - working-directory: mod
+        run: cargo test
